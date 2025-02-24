@@ -1,17 +1,31 @@
 import numpy as np
 
 import jax
-import jax.extend.ffi as ffi
+import jax.ffi as ffi
 
 from cudakdtree_jax_binding import _cudakdtree_interface
 
-TravelsalMode = _cudakdtree_interface.TraversalMode
+TraversalMode = _cudakdtree_interface.TraversalMode
+CandidateList = _cudakdtree_interface.CandidateList
 
 for name, target in _cudakdtree_interface.registrations().items():
-    ffi.register_ffi_target(name, target)
+    ffi.register_ffi_target(name, target, platform="CUDA")
 
 
-def kdtree_call(points, k: int, queries=None, box_size=None, traversal_mode="cct"):
+# Compiled combinations of n_dim, k, travesal_mode, candidate_list
+_supported_kdtree_configs = [
+    (2, 9, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (2, 25, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (2, 25, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
+
+    (3, 27, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
+    (3, 27, TraversalMode.cct, CandidateList.heap),
+]
+
+def kdtree_call(points, k: int, queries=None, box_size=None, max_radius=np.inf, 
+                traversal_mode=TraversalMode.stack_free_bounds_tracking,
+                candidate_list=CandidateList.fixed_list
+                ):
     if box_size is None:
         box_size = ()
 
@@ -23,12 +37,20 @@ def kdtree_call(points, k: int, queries=None, box_size=None, traversal_mode="cct
     idx_type = np.int32
     out_type = jax.ShapeDtypeStruct((n_query, k), idx_type)
 
+    n_dim = points.shape[1]
+    if (n_dim, k, traversal_mode, candidate_list) not in _supported_kdtree_configs:
+        raise ValueError(f"The combination of {n_dim=}, {k=}, {traversal_mode=}, "
+                         f"{candidate_list=} is not supported. The cuda interface "
+                         f"needs to be recompiled with this combination enabled.")
+
     return ffi.ffi_call(
         target_name="kdtree_call",
         result_shape_dtypes=out_type,
     )(
-        points, queries, queries, queries,
-        traversal_mode=traversal_mode,
+        points, queries,
+        traversal_mode=np.int32(traversal_mode),
+        candidate_list=np.int32(candidate_list),
         k=np.int32(k),
+        max_radius=np.float32(max_radius),
         box_size=np.array(box_size, dtype=np.float32)
     )

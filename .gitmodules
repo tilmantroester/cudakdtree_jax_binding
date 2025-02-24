@@ -1,0 +1,3 @@
+[submodule "extern/cudaKDTree"]
+	path = extern/cudaKDTree
+	url = https://github.com/tilmantroester/cudaKDTree.git
