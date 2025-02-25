@@ -9,13 +9,20 @@ New wrapper:
 - Uses new JAX FFI.
 
 ## Installation
-Requirements: currently requires jax main until 0.5.1 is out.
+Requirements: jax>=0.5.1.
 
 `pip install .`
+
+## Usage notes
+Because `cudaKDTree` is heavily template based, only the set of combinations of spatial dimensionality, number of neighbours, traversal algorithm, and candidate list algorithm that are built at compile time are available in the wrapper.
+
+The current set of combinations is listed [here](https://github.com/tilmantroester/cudakdtree_jax_binding/blob/main/src/cudakdtree_jax_binding/cudakdtree_interface.py#L15).
+
 
 ## Debug build
 `pip install . --config-settings=cmake.build-type=Debug -v`
 
 ## TODO
 - cudaKDTree: the stack-free implementation already tracks the node bounding boxes. This should allow early exit of the traversal, similar to the `cct` algorithm.
-- Check if pre-sorting the points speed things up
+- Check if pre-sorting the points speed things up.
+- Check where the the heap candidate list is faster than the fixed list.

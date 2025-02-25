@@ -1,12 +1,15 @@
 [build-system]
-requires = ["scikit-build-core", "nanobind", "jax>0.5.0"]
+requires = ["scikit-build-core", "nanobind", "jax>=0.5.1"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "cudakdtree_jax_binding"
+authors = [{name = "Tilman Tröster", email = "tilman@troester.space"}]
 version = "0.0.1"
 requires-python = ">=3.10"
-dependencies = ["jax"]
+dependencies = ["jax>=0.5.1"]
+description = "JAX binding for cudaKDTree"
+readme = "README.md"
 
 [project.optional-dependencies]
 test = ["pytest", "absl-py"]
