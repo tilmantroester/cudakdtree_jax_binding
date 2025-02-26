@@ -25,4 +25,5 @@ The current set of combinations is listed [here](https://github.com/tilmantroest
 ## TODO
 - cudaKDTree: the stack-free implementation already tracks the node bounding boxes. This should allow early exit of the traversal, similar to the `cct` algorithm.
 - Check if pre-sorting the points speed things up.
-- Check where the the heap candidate list is faster than the fixed list.
+- The order of the neighbours is unsorted when using the heap candidate list. This should be (optionally) sorted before returning. For k < ~128, fixed list seems to be faster in any case though, so supporting heap candidate list is not very high priority.
+- Return distances

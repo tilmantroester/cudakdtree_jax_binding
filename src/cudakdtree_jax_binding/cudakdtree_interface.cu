@@ -135,7 +135,6 @@ __global__ void knn_kernel(int32_t* results,
     typename KDTreeSpecT::CandidateListT result(max_radius);
     KDTreeSpecT::travelsal_func(result, queries[tid], *world_bounds, nodes, n_nodes, periodic_box_size);
 
-    result.sort();
     const int k = KDTreeSpecT::CandidateListT::num_k;
     for(int i=0; i < k; i++){
         const int idx = result.get_pointID(i);
@@ -262,18 +261,42 @@ ffi::Error kdtree_call_impl(cudaStream_t stream,
 
         auto [tree_queries_data, n_tree_queries] = get_queries<PointT>(queries, points);
 
-        if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 9) {
+        if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 8) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<8>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 9) {
             using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<9>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 16) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<16>, DataT, DataTraitsT>;
             CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
         }
         else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 25) {
             using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<25>, DataT, DataTraitsT>;
             CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
         }
-        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 25) {
-            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<25>, DataT, DataTraitsT>;
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 25) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<25>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 61) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<61>, DataT, DataTraitsT>;
             CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
         }
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 61) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<61>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 128) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<128>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 128) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<128>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
         else
             return INVALID_ARGUMENT_ERROR
     }
@@ -284,16 +307,52 @@ ffi::Error kdtree_call_impl(cudaStream_t stream,
 
         auto [tree_queries_data, n_tree_queries] = get_queries<PointT>(queries, points);
 
-        if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 27) {
+        if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 8) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<8>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 16) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<16>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 27) {
             using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<27>, DataT, DataTraitsT>;
             CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
         }
-        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 27) {
-            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<27>, DataT, DataTraitsT>;
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 27) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<27>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 33) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<33>, DataT, DataTraitsT>;
             CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
         }
-        else if(traversal_mode == TraversalMode::cct && candidate_list == CandidateList::heap && k == 27) {
-            using KDTreeSpecT = KDTreeSpec<TraversalMode::cct, cukd::HeapCandidateList<27>, DataT, DataTraitsT>;
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 100) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<100>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 100) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<100>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 128) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<128>, DataT, DataTraitsT>;
+            CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        }
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 128) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<128>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::fixed_list && k == 179) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::FixedCandidateList<179>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        // else if(traversal_mode == TraversalMode::stack_free_bounds_tracking && candidate_list == CandidateList::heap && k == 179) {
+        //     using KDTreeSpecT = KDTreeSpec<TraversalMode::stack_free_bounds_tracking, cukd::HeapCandidateList<179>, DataT, DataTraitsT>;
+        //     CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
+        // }
+        else if(traversal_mode == TraversalMode::cct && candidate_list == CandidateList::fixed_list && k == 27) {
+            using KDTreeSpecT = KDTreeSpec<TraversalMode::cct, cukd::FixedCandidateList<27>, DataT, DataTraitsT>;
             CALL_CUDA_KDTREE(KDTreeSpecT, PointT)
         }
         else

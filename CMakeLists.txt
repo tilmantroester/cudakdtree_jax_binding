@@ -19,5 +19,6 @@ set(MODULE _cudakdtree_interface)
 nanobind_add_module(${MODULE} NB_STATIC "src/cudakdtree_jax_binding/cudakdtree_interface.cu")
 target_include_directories(${MODULE} PUBLIC ${XLA_DIR})
 target_link_libraries(${MODULE} PRIVATE CUDA::cudart)
+# Enable debug symbols in debug builds
 target_compile_options(${MODULE} PRIVATE "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CUDA>>:-G;-src-in-ptx>")
 install(TARGETS ${MODULE} LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})

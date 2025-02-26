@@ -14,12 +14,20 @@ for name, target in _cudakdtree_interface.registrations().items():
 
 # Compiled combinations of n_dim, k, travesal_mode, candidate_list
 _supported_kdtree_configs = [
+    (2, 8, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
     (2, 9, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (2, 16, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
     (2, 25, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
-    (2, 25, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
+    (2, 61, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (2, 128, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
 
-    (3, 27, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
-    (3, 27, TraversalMode.cct, CandidateList.heap),
+    (3, 8, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (3, 16, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (3, 27, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (3, 33, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (3, 100, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (3, 128, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
+    (3, 27, TraversalMode.cct, CandidateList.fixed_list),
 ]
 
 def kdtree_call(points, k: int, queries=None, box_size=None, max_radius=np.inf, 
