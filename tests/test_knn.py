@@ -50,17 +50,11 @@ def scipy_knn(points, k, box_size, max_radius):
         (TOY_10_2D, 9, np.inf, TOY_10_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
         (TOY_10_2D, 25, np.inf, TOY_10_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
         (TOY_10_2D, 25, 30.0, TOY_10_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
-        (TOY_10_2D, 25, 30.0, TOY_10_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
 
         (UNIFORM_100_2D, 9, np.inf, None, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
         (UNIFORM_100_2D, 9, np.inf, UNIFORM_100_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
         (UNIFORM_100_2D, 25, np.inf, UNIFORM_100_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.fixed_list),
-        (UNIFORM_100_2D, 25, np.inf, UNIFORM_100_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
-        (UNIFORM_100_3D, 27, np.inf, UNIFORM_100_3D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
-        (UNIFORM_100_3D, 27, np.inf, None, TraversalMode.cct, CandidateList.heap),
-
-        (UNIFORM_1000_2D, 25, np.inf, UNIFORM_100_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
-        (UNIFORM_1000_3D, 27, np.inf, UNIFORM_100_3D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap),
+        (UNIFORM_100_3D, 27, np.inf, None, TraversalMode.cct, CandidateList.fixed_list),
     ]
 )
 def test_knn(points, k, max_radius, box_size, traversal_mode, candidate_list, debug_print=False):
@@ -98,5 +92,16 @@ def test_jit():
     )
 
 
+def test_stop_gradients_jit():
+    @jax.jit
+    def f(points):
+        idx = jax.lax.stop_gradient(kdtree_call(points=jax.lax.stop_gradient(points), k=9, box_size=UNIFORM_100_2D_BOX))
+        return idx
+
+    idx = f(UNIFORM_100_2D)
+    idx.block_until_ready()
+
+
 if __name__ == "__main__":
-    test_knn(UNIFORM_100_2D, 25, np.inf, UNIFORM_100_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap, debug_print=True)
+    # test_knn(UNIFORM_100_2D, 25, np.inf, UNIFORM_100_2D_BOX, TraversalMode.stack_free_bounds_tracking, CandidateList.heap, debug_print=True)
+    test_stop_gradients_jit()

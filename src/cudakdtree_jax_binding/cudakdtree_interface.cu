@@ -167,10 +167,11 @@ void cudakdtree_knn_wrapper(cudaStream_t stream,
     using PointT = typename KDTreeSpecT::PointT;
     using DataT = typename KDTreeSpecT::DataT;
     using DataTraitsT = typename KDTreeSpecT::DataTraitsT;
-    
+
     // Make copy of positions and attach a tag to be able to track the order of the points
     DataT *ordered_points;
-    cudaMallocManaged((void**)&ordered_points, n_points*sizeof(*ordered_points));
+    // use cudaMallocAsync instead?
+    CUKD_CUDA_CHECK(cudaMallocManaged((void**)&ordered_points,n_points*sizeof(*ordered_points)));
     int bs = 128;
     int nb = cukd::divRoundUp(n_points, bs);
     copy_positions_and_idx_kernel<<<nb, bs, 0, stream>>>(ordered_points, positions, n_points);
@@ -178,7 +179,7 @@ void cudakdtree_knn_wrapper(cudaStream_t stream,
 
     // Allocate box for world bounds tht will be filled in when building the tree
     cukd::box_t<PointT>* bounds_ptr;
-    cudaMallocManaged((void**)&bounds_ptr, sizeof(cukd::box_t<PointT>));
+    CUKD_CUDA_CHECK(cudaMallocManaged((void**)&bounds_ptr, sizeof(cukd::box_t<PointT>)));
     // Build the KDTree from the provided points
     cukd::buildTree<DataT, DataTraitsT>(ordered_points, n_points, bounds_ptr, stream);
     CUKD_CUDA_SYNC_CHECK()
@@ -186,7 +187,7 @@ void cudakdtree_knn_wrapper(cudaStream_t stream,
     // If a box size is specified, pass that to the traversal code. Else pass a nullptr, which means no periodic boundaries.
     PointT *box_size_ptr = nullptr;
     if(box_size.size() > 0) {
-        cudaMallocManaged((void**)&box_size_ptr, sizeof(PointT));
+        CUKD_CUDA_CHECK(cudaMallocManaged((void**)&box_size_ptr, sizeof(PointT)));
         for(int i = 0; i < box_size.size(); i++) {
             cukd::set_coord(*box_size_ptr, i, box_size[i]);
         }
